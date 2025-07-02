@@ -2,6 +2,20 @@ POST http://localhost:8080/products
 Content-Type: application/json
 
 {
-  "name": "Sample Product 2",
-  "price": 100
+  "name": "Sample Product 3",
+  "price": 15.50
+}
+
+###
+
+GET http://localhost:8080/products/7e3ceb01-9101-4725-aeb9-b8f24eacbeec
+
+###
+
+PUT http://localhost:8080/products/7e3ceb01-9101-4725-aeb9-b8f24eacbeec
+Content-Type: application/json
+
+{
+  "name": "Updated Product",
+  "price": 20.49
 }

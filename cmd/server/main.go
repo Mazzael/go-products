@@ -7,6 +7,8 @@ import (
 	"github.com/Mazzael/go-api/internal/entity"
 	"github.com/Mazzael/go-api/internal/infra/database"
 	"github.com/Mazzael/go-api/internal/infra/webserver/handlers"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -28,6 +30,12 @@ func main() {
 
 	productHandler := handlers.NewProductHandler(gormProductRepository)
 
-	http.HandleFunc("/products", productHandler.CreateProduct)
-	http.ListenAndServe(":8080", nil)
+	r := chi.NewRouter()
+
+	r.Use(middleware.Logger)
+	r.Post("/products", productHandler.CreateProduct)
+	r.Get("/products/{id}", productHandler.GetProduct)
+	r.Put("/products/{id}", productHandler.UpdateProduct)
+
+	http.ListenAndServe(":8080", r)
 }
