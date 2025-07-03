@@ -12,6 +12,10 @@ GET http://localhost:8080/products/7e3ceb01-9101-4725-aeb9-b8f24eacbeec
 
 ###
 
+GET http://localhost:8080/products?page=0&limit=10&sort=asc
+
+###
+
 PUT http://localhost:8080/products/7e3ceb01-9101-4725-aeb9-b8f24eacbeec
 Content-Type: application/json
 
@@ -19,3 +23,7 @@ Content-Type: application/json
   "name": "Updated Product",
   "price": 20.49
 }
+
+###
+
+DELETE http://localhost:8080/products/7e3ceb01-9101-4725-aeb9-b8f24eacbeec
