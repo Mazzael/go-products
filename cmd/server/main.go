@@ -27,8 +27,10 @@ func main() {
 	db.AutoMigrate(&entity.Product{}, &entity.User{})
 
 	gormProductRepository := database.NewProduct(db)
-
 	productHandler := handlers.NewProductHandler(gormProductRepository)
+
+	gormUserRepository := database.NewUser(db)
+	userHandler := handlers.NewUserHandler(gormUserRepository)
 
 	r := chi.NewRouter()
 
@@ -38,6 +40,8 @@ func main() {
 	r.Get("/products", productHandler.GetProducts)
 	r.Put("/products/{id}", productHandler.UpdateProduct)
 	r.Delete("/products/{id}", productHandler.DeleteProduct)
+
+	r.Post("/users", userHandler.CreateUser)
 
 	http.ListenAndServe(":8080", r)
 }
