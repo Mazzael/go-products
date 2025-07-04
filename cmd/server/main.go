@@ -4,15 +4,30 @@ import (
 	"net/http"
 
 	"github.com/Mazzael/go-api/configs"
+	_ "github.com/Mazzael/go-api/docs"
 	"github.com/Mazzael/go-api/internal/entity"
 	"github.com/Mazzael/go-api/internal/infra/database"
 	"github.com/Mazzael/go-api/internal/infra/webserver/handlers"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/jwtauth"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
+
+// @title           Go API Example
+// @version         1.0
+// @description     Product API with auhtentication
+
+// @contact.name   Vinicius Trujillo Mazza
+// @contact.email  vtrujillomazza@gmail.com
+
+// @host      localhost:8080
+// @BasePath  /
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 
 func main() {
 	configs, err := configs.LoadConfig(".")
@@ -51,6 +66,8 @@ func main() {
 
 	r.Post("/users", userHandler.CreateUser)
 	r.Post("/users/auth", userHandler.Login)
+
+	r.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL("http://localhost:8080/docs/doc.json")))
 
 	http.ListenAndServe(":8080", r)
 }
