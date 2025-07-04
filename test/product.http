@@ -13,6 +13,7 @@ GET http://localhost:8080/products/7e3ceb01-9101-4725-aeb9-b8f24eacbeec
 ###
 
 GET http://localhost:8080/products?page=0&limit=10&sort=asc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTE1OTAyNzYsInN1YiI6IjMwMjljMDMzLTFjZWUtNDk2Zi1hZjVjLTUzYmViMWFmNzI5ZCJ9.x6ZnnkDTseJMbtHCx0Soxq9mxP6y7WBFquXsSJx1ZOQ
 
 ###
 

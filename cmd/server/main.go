@@ -9,6 +9,7 @@ import (
 	"github.com/Mazzael/go-api/internal/infra/webserver/handlers"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/jwtauth"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -30,16 +31,23 @@ func main() {
 	productHandler := handlers.NewProductHandler(gormProductRepository)
 
 	gormUserRepository := database.NewUser(db)
-	userHandler := handlers.NewUserHandler(gormUserRepository, configs.TokenAuth, configs.JWTExpiresIn)
+	userHandler := handlers.NewUserHandler(gormUserRepository)
 
 	r := chi.NewRouter()
-
 	r.Use(middleware.Logger)
-	r.Post("/products", productHandler.CreateProduct)
-	r.Get("/products/{id}", productHandler.GetProduct)
-	r.Get("/products", productHandler.GetProducts)
-	r.Put("/products/{id}", productHandler.UpdateProduct)
-	r.Delete("/products/{id}", productHandler.DeleteProduct)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.WithValue("token", configs.TokenAuth))
+	r.Use(middleware.WithValue("JwtExpiresIn", configs.JWTExpiresIn))
+
+	r.Route("/products", func(r chi.Router) {
+		r.Use(jwtauth.Verifier(configs.TokenAuth))
+		r.Use(jwtauth.Authenticator)
+		r.Post("/", productHandler.CreateProduct)
+		r.Get("/{id}", productHandler.GetProduct)
+		r.Get("/", productHandler.GetProducts)
+		r.Put("/{id}", productHandler.UpdateProduct)
+		r.Delete("/{id}", productHandler.DeleteProduct)
+	})
 
 	r.Post("/users", userHandler.CreateUser)
 	r.Post("/users/auth", userHandler.Login)

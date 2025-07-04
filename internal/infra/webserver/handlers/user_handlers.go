@@ -13,19 +13,17 @@ import (
 
 type UserHandler struct {
 	GormUserRepository database.UserRepository
-	Jwt                *jwtauth.JWTAuth
-	JwtExpiresIn       int
 }
 
-func NewUserHandler(repo database.UserRepository, jwt *jwtauth.JWTAuth, JwtExpiresIn int) *UserHandler {
+func NewUserHandler(repo database.UserRepository) *UserHandler {
 	return &UserHandler{
-		GormUserRepository: repo,
-		Jwt:                jwt,
-		JwtExpiresIn:       JwtExpiresIn,
-	}
+		GormUserRepository: repo}
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
+	jwt := r.Context().Value("token").(*jwtauth.JWTAuth)
+	jwtExpiresIn := r.Context().Value("JwtExpiresIn").(int)
+
 	var user dto.UserLoginInput
 
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -40,9 +38,9 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, tokenString, _ := h.Jwt.Encode(map[string]interface{}{
+	_, tokenString, _ := jwt.Encode(map[string]interface{}{
 		"sub": u.ID.String(),
-		"exp": time.Now().Add(time.Second * time.Duration(h.JwtExpiresIn)).Unix(),
+		"exp": time.Now().Add(time.Second * time.Duration(jwtExpiresIn)).Unix(),
 	})
 
 	accessToken := struct {
