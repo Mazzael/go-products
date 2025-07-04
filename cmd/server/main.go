@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	_, err := configs.LoadConfig(".")
+	configs, err := configs.LoadConfig(".")
 	if err != nil {
 		panic("Failed to load configuration: " + err.Error())
 	}
@@ -30,7 +30,7 @@ func main() {
 	productHandler := handlers.NewProductHandler(gormProductRepository)
 
 	gormUserRepository := database.NewUser(db)
-	userHandler := handlers.NewUserHandler(gormUserRepository)
+	userHandler := handlers.NewUserHandler(gormUserRepository, configs.TokenAuth, configs.JWTExpiresIn)
 
 	r := chi.NewRouter()
 
@@ -42,6 +42,7 @@ func main() {
 	r.Delete("/products/{id}", productHandler.DeleteProduct)
 
 	r.Post("/users", userHandler.CreateUser)
+	r.Post("/users/auth", userHandler.Login)
 
 	http.ListenAndServe(":8080", r)
 }

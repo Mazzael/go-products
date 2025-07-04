@@ -5,3 +5,12 @@ POST http://localhost:8080/users
     "email": "johndoe@example.com",
     "password": "123456"
 }
+
+###
+
+POST http://localhost:8080/users/auth
+
+{
+    "email": "johndoe@example.com",
+    "password": "123456"
+}
