@@ -24,6 +24,18 @@ func NewUserHandler(repo database.UserRepository) *UserHandler {
 		GormUserRepository: repo}
 }
 
+// Login godoc
+// @Summary      User login
+// @Description  User login
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request   body     dto.UserLoginInput  true  "user credentials"
+// @Success      200  {object}  dto.UserLoginOutput
+// @Failure      401
+// @Failure      404  {object}  Error
+// @Failure      500  {object}  Error
+// @Router       /users/auth [post]
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	jwt := r.Context().Value("token").(*jwtauth.JWTAuth)
 	jwtExpiresIn := r.Context().Value("JwtExpiresIn").(int)
@@ -37,7 +49,14 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u, err := h.GormUserRepository.FindByEmail(user.Email)
-	if err != nil || !u.ValidatePassword(user.Password) {
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		err := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	if !u.ValidatePassword(user.Password) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -47,9 +66,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		"exp": time.Now().Add(time.Second * time.Duration(jwtExpiresIn)).Unix(),
 	})
 
-	accessToken := struct {
-		AccessToken string `json:"access_token"`
-	}{
+	accessToken := dto.UserLoginOutput{
 		AccessToken: tokenString,
 	}
 
